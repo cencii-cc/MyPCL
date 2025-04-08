@@ -38,6 +38,43 @@ namespace MyPCL.Utils
         {
             return Environment.TickCount + 2147483651L;
         }
+
+        /// <summary>
+        /// 返回一个枚举对应的字符串。
+        /// </summary>
+        /// <param name="EnumData">一个已经实例化的枚举类型。</param>
+        /// <returns></returns>
+        public static string GetStringFromEnum(System.Enum EnumData)
+        {
+            return System.Enum.GetName(EnumData.GetType(), EnumData);
+        }
+
+
+        // <summary>
+        /// 将元素与 List 的混合体拆分为元素组。
+        /// </summary>
+        /// <typeparam name="T">元素类型</typeparam>
+        /// <param name="data">包含元素和列表混合的 IList</param>
+        /// <returns>仅包含指定类型元素的 List</returns>
+        public static List<T> GetFullList<T>(IList data)
+        {
+            List<T> result = new List<T>();
+            for (int i = 0; i < data.Count; i++)
+            {
+                if (data[i] is ICollection collection)
+                {
+                    foreach (var item in collection)
+                    {
+                        result.Add((T)item);
+                    }
+                }
+                else
+                {
+                    result.Add((T)data[i]);
+                }
+            }
+            return result;
+        }
     }
 
 

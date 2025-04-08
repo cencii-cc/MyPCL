@@ -82,6 +82,7 @@
     <Compile Include="Utils\Interface\ILoadingTrigger.cs" />
     <Compile Include="Utils\LoaderBase.cs" />
     <Compile Include="Utils\LogUtil.cs" />
+    <Compile Include="Utils\MathUtil.cs" />
     <Compile Include="Utils\NetUtil.cs" />
     <Compile Include="Utils\RandomUtil.cs" />
     <Compile Include="Utils\SecretUtil.cs" />

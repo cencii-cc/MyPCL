@@ -14,6 +14,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using static MyPCL.Utils.BaseUtil;
 using static MyPCL.Utils.ThreadUtil;
+using static MyPCL.Utils.AnimationUtil;
+using MyPCL.Utils;
 
 namespace MyPCL.MyControls
 {
@@ -102,15 +104,72 @@ namespace MyPCL.MyControls
                     {
                         // 有了 // 显示动画
                         Visibility = Visibility.Visible;
+                        AniStart(new[] 
+                        { 
+                            AaScaleTransform(this, 0.3 - ((ScaleTransform)RenderTransform).ScaleX, 500, 60, new AniEaseOutFluent(AniEasePower.Weak)),
+                            AaScaleTransform(this,0.7,500,60,new AniEaseOutBack(AniEasePower.Weak)),
+                            AaHeight(this,50 - Height,200,0,new AniEaseOutFluent(AniEasePower.Weak))
+                        }, $"MyExtraButton MainScale {Uuid}");
                     }
-                
+                    else
+                    {
+                        // 没了
+                        AniStart(new[]
+                        {
+                            AaScaleTransform(this,-((ScaleTransform)RenderTransform).ScaleX, 100,0, new AniEaseInFluent(AniEasePower.Weak)),
+                            AaHeight(this,-Height,400,100,new AniEaseOutFluent()),
+                            AaCode(()=>{ Visibility = Visibility.Collapsed; },0,true)
+                        }, $"MyExtraButton MainScale {Uuid}");
+                    }
+                    // 防止缩放动画中依然可以点进去
+                    IsHitTestVisible = value;
                 });
             }
+        }
+
+        public delegate bool ShowCheckDelegate();
+        public ShowCheckDelegate ShowCheck = null;
+
+        /// <summary>
+        /// 刷新显示
+        /// </summary>
+        public void ShowRefresh()
+        {
+            if(ShowCheck != null) Show = ShowCheck();
         }
 
         public MyExtraButton()
         {
             InitializeComponent();
         }
+
+        /// <summary>
+        /// 发出一圈波浪效果提示。
+        /// </summary>
+        public void Ribble()
+        {
+            RunInUi(() =>
+            {
+                Border shape = new Border
+                {
+                    CornerRadius = new CornerRadius(1000),
+                    BorderThickness = new Thickness(0.001),
+                    Opacity = 0.5,
+                    RenderTransformOrigin = new Point(0.5, 0.5),
+                    RenderTransform = new ScaleTransform()
+                };
+                shape.SetResourceReference(Border.BackgroundProperty, "ColorBrush5");
+                PanScale.Children.Insert(0, shape);
+
+                AniData[] animations = new AniData[]
+                {
+                    AaScaleTransform(shape, 13, 1000, ease : new AniEaseInoutFluent(AniEasePower.Strong, 0.3)),
+                    AaOpacity(shape, -shape.Opacity, 1000),
+                    AaCode(() => PanScale.Children.Remove(shape), after : true)
+                };
+                AniStart(animations, "ExtraButton Ribble " + GetUuid());
+            });
+        }
+
     }
 }
