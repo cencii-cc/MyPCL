@@ -70,8 +70,7 @@ namespace MyPCL.MyControls
             {
                 if (_Logo == value) return;
                 _Logo = value;
-                var path = GetTemplateChild("Path") as Path;
-                path.Data = Geometry.Parse(value);
+                Path.Data = Geometry.Parse(value);
             }
         }
 
@@ -126,6 +125,17 @@ namespace MyPCL.MyControls
                 });
             }
         }
+
+        private bool _CanRightClick = false;
+        public bool CanRightClick
+        {
+            get => _CanRightClick;
+            set
+            {
+                _CanRightClick = value;
+            }
+        }
+
 
         public delegate bool ShowCheckDelegate();
         public ShowCheckDelegate ShowCheck = null;
