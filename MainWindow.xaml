@@ -1,0 +1,178 @@
+﻿<Window x:Class="MyPCL.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MyPCL"
+        Style="{StaticResource MyWindow}"
+        mc:Ignorable="d"
+        AllowDrop="True" Topmost="True" Title="Plain Craft Launcher　" AllowsTransparency="True" MinHeight="470" MinWidth="810" 
+        ScrollViewer.VerticalScrollBarVisibility="Disabled"
+        Icon="/MyPCL;component/Images/icon.ico"
+        WindowStyle="None" 
+        ResizeMode="CanMinimize" 
+        Background="{x:Null}" 
+        d:DesignWidth="870" 
+        d:DesignHeight="520" 
+        Width="850" 
+        Height="500" 
+        RenderTransformOrigin="0.5,0.5">
+    <!--它允许你对窗口在任务栏上的显示方式进行定制。通过设置 TaskbarItemInfo 的不同属性，可以实现诸如进度条显示、缩略图裁剪、叠加图标等功能，从而增强用户在任务栏上与窗口的交互体验。-->
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo ThumbnailClipMargin="{Binding Margin, ElementName=PanForm}" />
+    </Window.TaskbarItemInfo>
+    <Grid x:Name="PanBack" SnapsToDevicePixels="True" UseLayoutRounding="True" Margin="10" RenderTransformOrigin="0.5,0.5">
+        <!-- 这段代码定义了一个 Grid 控件，通过设置其属性和应用渲染变换，实现了 Grid 控件的清晰显示、外边距设置，并且将其逆时针旋转 4 度并向下平移 60 个单位。这些设置可以让界面元素呈现出特定的视觉效果，增强界面的美观性和交互性。 -->
+        <Grid.RenderTransform>
+            <TransformGroup>
+                <RotateTransform x:Name="TransformRotate" Angle="-4" />
+                <TranslateTransform x:Name="TransformPos" X="0" Y="60" />
+            </TransformGroup>
+        </Grid.RenderTransform>
+
+        <!--此 Rectangle 元素主要用于创建一个具有垂直渐变填充效果的矩形，且鼠标悬停时指针会变为垂直调整大小的样式，可能用于实现窗口或其他容器的垂直大小调整功能。通过设置渐变填充，让矩形呈现出从顶部透明到底部半透明的视觉效果。-->
+        <Rectangle x:Name="ResizerT" Stroke="{x:Null}" StrokeThickness="0.0001" Height="8" VerticalAlignment="Top" Margin="13,0" Cursor="SizeNS">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="#21000000" Offset="1" />
+                    <GradientStop Color="#11000000" Offset="0.7" />
+                    <GradientStop Color="#00000000" Offset="0" />
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Rectangle x:Name="ResizerB" Stroke="{x:Null}" StrokeThickness="0.0001" Height="8" VerticalAlignment="Bottom" Margin="13,0" Cursor="SizeNS">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="#21000000" Offset="0" />
+                    <GradientStop Color="#11000000" Offset="0.3" />
+                    <GradientStop Color="#00000000" Offset="1" />
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Rectangle x:Name="ResizerR" HorizontalAlignment="Right" Margin="0,13" Stroke="{x:Null}" StrokeThickness="0.0001" Width="8" Cursor="SizeWE">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="1,0.5" StartPoint="0,0.5">
+                    <GradientStop Color="#21000000" Offset="0" />
+                    <GradientStop Color="#11000000" Offset="0.3" />
+                    <GradientStop Color="#00000000" Offset="1" />
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Rectangle x:Name="ResizerL" HorizontalAlignment="Left" Stroke="{x:Null}" Width="8" Margin="0,13" StrokeThickness="0.0001" Cursor="SizeWE">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="1,0.5" StartPoint="0,0.5">
+                    <GradientStop Color="#21000000" Offset="1" />
+                    <GradientStop Color="#11000000" Offset="0.7" />
+                    <GradientStop Color="#00000000" Offset="0" />
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Rectangle x:Name="ResizerLT" HorizontalAlignment="Left" Stroke="{x:Null}" Width="13" StrokeThickness="0.0001" VerticalAlignment="Top" Height="13" Cursor="SizeNWSE">
+            <Rectangle.Fill>
+                <RadialGradientBrush Center="1,1" GradientOrigin="1,1" RadiusX="1" RadiusY="1">
+                    <GradientStop Color="#21000000" Offset="0.2" />
+                    <GradientStop Color="#00000000" Offset="1" />
+                </RadialGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Rectangle x:Name="ResizerLB" HorizontalAlignment="Left" Stroke="{x:Null}" Width="13" StrokeThickness="0.0001" VerticalAlignment="Bottom" Height="13" Cursor="SizeNESW">
+            <Rectangle.Fill>
+                <RadialGradientBrush Center="1,0" GradientOrigin="1,0" RadiusX="1" RadiusY="1">
+                    <GradientStop Color="#21000000" Offset="0.2" />
+                    <GradientStop Color="#00000000" Offset="1" />
+                </RadialGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Rectangle x:Name="ResizerRB" HorizontalAlignment="Right" Stroke="{x:Null}" Width="13" StrokeThickness="0.0001" VerticalAlignment="Bottom" Height="13" Cursor="SizeNWSE">
+            <Rectangle.Fill>
+                <RadialGradientBrush Center="0,0" GradientOrigin="0,0" RadiusX="1" RadiusY="1">
+                    <GradientStop Color="#21000000" Offset="0.2" />
+                    <GradientStop Color="#00000000" Offset="1" />
+                </RadialGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Rectangle x:Name="ResizerRT" HorizontalAlignment="Right" Stroke="{x:Null}" Width="13" StrokeThickness="0.0001" VerticalAlignment="Top" Height="13" Cursor="SizeNESW">
+            <Rectangle.Fill>
+                <RadialGradientBrush Center="0,1" GradientOrigin="0,1" RadiusX="1" RadiusY="1">
+                    <GradientStop Color="#21000000" Offset="0.2" />
+                    <GradientStop Color="#00000000" Offset="1" />
+                </RadialGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Border Margin="8" x:Name="BorderForm">
+            
+            <!--边框圆角-->
+            <Border.Clip>
+                <RectangleGeometry x:Name="RectForm" RadiusX="6" RadiusY="6" />
+            </Border.Clip>
+            <!--定义布局-->
+            <Grid x:Name="PanForm" SnapsToDevicePixels="False" UseLayoutRounding="False">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <!-- 背景图片 -->
+                <Canvas x:Name="ImgBack" IsHitTestVisible="False" Grid.Row="1" RenderOptions.BitmapScalingMode="LowQuality" />
+                <!-- 标题栏 -->
+                <Grid x:Name="PanTitle" Height="48">
+                    <!-- 标题背景颜色 -->
+                    <Grid.Background>
+                        <LinearGradientBrush EndPoint="1,0" StartPoint="0,0">
+                            <GradientStop Color="{StaticResource ColorObject3}" Offset="0"/>
+                            <GradientStop Color="{StaticResource ColorObject2}" Offset="0.5"/>
+                            <GradientStop Color="{StaticResource ColorObject3}" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Grid.Background>
+                </Grid>
+                
+                <!-- 左 -->
+                <Grid x:Name="PanLeft" Grid.Row="1" HorizontalAlignment="Left" SnapsToDevicePixels="True">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="1" />
+                    </Grid.ColumnDefinitions>
+                    <!--背景-->
+                    <Rectangle x:Name="RectLeftBackground" Width="0" Fill="{DynamicResource ColorBrushBackgroundTransparentSidebar}" IsHitTestVisible ="False"/>
+                    <!--阴影-->
+                    <Rectangle x:Name="RectLeftShadow" Width="4" HorizontalAlignment="Left" IsHitTestVisible="False" Grid.Column="1">
+                        <Rectangle.Fill>
+                            <LinearGradientBrush EndPoint="1,0" StartPoint="0,0" Opacity="0.085">
+                                <GradientStop Color="#000000" Offset="0"/>
+                                <GradientStop Color="#00000000" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+
+                </Grid>
+                
+                <!-- 主 -->
+                <Grid x:Name="PanMain" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="1" Grid.IsSharedSizeScope="True" UseLayoutRounding="True" SnapsToDevicePixels="True">
+                        <Border x:Name="PanMainRight" RenderOptions.BitmapScalingMode="NearestNeighbor" UseLayoutRounding="False" SnapsToDevicePixels="False">
+                        </Border>
+                    </Border>
+                    <Border Grid.IsSharedSizeScope="True" UseLayoutRounding="True" SnapsToDevicePixels="True">
+                        <Border x:Name="PanMainLeft" RenderOptions.BitmapScalingMode="NearestNeighbor" UseLayoutRounding="False" SnapsToDevicePixels="False">
+                        </Border>
+                    </Border>
+                </Grid>
+
+                <!-- 提示框 -->
+                <StackPanel x:Name="PanHint" IsHitTestVisible="False" UseLayoutRounding="True" SnapsToDevicePixels="True" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="0,0,0,20" Grid.RowSpan="2" />
+
+                <!-- 左变底下的按钮 -->
+                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Row="1" Margin="15">
+                    
+                    
+                </StackPanel>
+                
+                <!-- 占据屏幕的提示框 -->
+                <Grid x:Name="PanMsg" Grid.RowSpan="2" Background="#00000000" Visibility="Collapsed" />
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
