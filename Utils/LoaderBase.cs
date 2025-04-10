@@ -8,6 +8,19 @@ using System.Threading.Tasks;
 
 namespace MyPCL.Utils
 {
+
+    /// <summary>
+    /// 模块加载状态枚举。
+    /// </summary>
+    public enum LoadState
+    {
+        Waiting,
+        Loading,
+        Finished,
+        Failed,
+        Aborted
+    }
+
     /// <summary>
     /// 加载器的统一基类。
     /// </summary>
@@ -59,6 +72,29 @@ namespace MyPCL.Utils
                 }
             }
         }
+
+        /// <summary>
+        /// 在加载器目标事件执行完成，加载器状态即将变为 Finish 时调用。可以视为扩展加载器目标事件。
+        /// </summary>
+        public event Action<LoaderBase> PreviewFinish;
+
+        protected void RaisePreviewFinish()
+        {
+            PreviewFinish?.Invoke(this);
+        }
+
+        /// <summary>
+        /// 当状态改变时，在工作线程触发代码。在添加事件后，必须将 HasOnStateChangedThread 设为 True。
+        /// </summary>
+        public event Action<LoaderBase, LoadState, LoadState> OnStateChangedThread;
+        public bool HasOnStateChangedThread = false;
+
+
+        /// <summary>
+        /// 当状态改变时，在工作线程触发代码。在添加事件后，必须将 HasOnStateChangedThread 设为 True。
+        /// </summary>
+        public event Action<LoaderBase, LoadState, LoadState> OnStateChangedUi;
+
 
         public MyLoadingState LoadingState { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 

@@ -15,7 +15,6 @@ namespace MyPCL.Utils
     public static class ThreadUtil
     {
 
-
         private static readonly int UiThreadId = Thread.CurrentThread.ManagedThreadId;
 
         /// <summary>
@@ -103,6 +102,16 @@ namespace MyPCL.Utils
             th.Priority = Priority;
             th.Start();
             return th;
+        }
+
+        /// <summary>
+        /// 确保在工作线程中执行代码。
+        /// </summary>
+        /// <param name="action"></param>
+        public static void RunInThread(Action action)
+        {
+            if (RunInUi()) RunInNewThread(action, $"Runtime Invoke {BaseUtil.GetUuid()} #");
+            else action();
         }
     }
 }

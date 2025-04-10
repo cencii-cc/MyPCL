@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace MyPCL
 {
@@ -13,5 +14,7 @@ namespace MyPCL
     /// </summary>
     public partial class App : Application
     {
+
+        public static List<Border> ShowingTooltips { set; get; } = new List<Border>();
     }
 }

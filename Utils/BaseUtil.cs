@@ -1,10 +1,17 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using static MyPCL.Utils.LogUtil;
+using static MyPCL.ViewModules.HintModule;
+using static MyPCL.Utils.ThreadUtil;
+using System.Threading;
+using MyPCL.ViewModules;
 
 namespace MyPCL.Utils
 {
@@ -75,6 +82,66 @@ namespace MyPCL.Utils
             }
             return result;
         }
+
+        /// <summary>
+        /// 获取格式类似于“11:08:52.037”的当前时间的字符串。
+        /// </summary>
+        /// <returns></returns>
+        public static string GetTimeNow()
+        {
+            return DateTime.Now.ToString("HH:mm:ss.fff");
+        }
+
+        /// <summary>
+        /// 打开网页。
+        /// </summary>
+        public static void OpenWebsite(string url)
+        {
+            try
+            {
+                if (url.StartsWith("http", StringComparison.InvariantCultureIgnoreCase) && !url.StartsWith("minecraft://", StringComparison.InvariantCultureIgnoreCase))
+                    throw new Exception($"{url}不是一个有效的网址，它必须以 http 开头！");
+                Log("[System] 正在打开网页：" + url);
+                Process.Start(url);
+            }
+            catch(Exception ex)
+            {
+                Log(ex, $"无法打开网页({url})");
+
+            }
+        }
+
+        public static void ClipboardSet(string text,bool ShowSuccessHint = true)
+        {
+            RunInThread(() => 
+            {
+                int retryCount = 0;
+            Retry:
+                try
+                {
+                    RunInUi(() => 
+                    {
+                        Clipboard.Clear();
+                        Clipboard.SetText(text);
+                    });
+                }
+                catch(Exception ex)
+                {
+                    retryCount++;
+                    if(retryCount <= 5)
+                    {
+                        Thread.Sleep(20);
+                        goto Retry;
+                    }
+                    else
+                    {
+                        Log(ex, "可能由于剪贴板被其他程序占用，文本复制失败", LogLevel.Hint);
+                    }
+                }
+                if (ShowSuccessHint) Hint("已成功复制！", HintType.Finish);
+            });
+        }
+
     }
 
 

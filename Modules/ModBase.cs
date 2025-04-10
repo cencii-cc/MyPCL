@@ -108,5 +108,10 @@ namespace MyPCL.Modules
 
 
         public static bool ModeDebug = false;
+
+        /// <summary>
+        /// 程序是否已结束。
+        /// </summary>
+        public static bool IsProgramEnded = false;
     }
 }

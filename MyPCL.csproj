@@ -47,6 +47,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -66,18 +67,34 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Modules\Base\Validate.cs" />
     <Compile Include="Modules\Minecraft\ModLaunch.cs" />
+    <Compile Include="Modules\Minecraft\ModMinecraft.cs" />
     <Compile Include="Modules\ModBase.cs" />
+    <Compile Include="MyControls\MyButton.xaml.cs">
+      <DependentUpon>MyButton.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MyControls\MyExtraButton.xaml.cs">
       <DependentUpon>MyExtraButton.xaml</DependentUpon>
     </Compile>
     <Compile Include="MyControls\MyImage.cs" />
+    <Compile Include="MyControls\MyLoading.xaml.cs">
+      <DependentUpon>MyLoading.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MyControls\MyMsg\MyMsgInput.xaml.cs">
+      <DependentUpon>MyMsgInput.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MyControls\MyPageRight.cs" />
+    <Compile Include="MyControls\MyScrollBar.cs" />
+    <Compile Include="MyControls\MyScrollViewer.cs" />
     <Compile Include="Utils\AnimationUtil.cs" />
     <Compile Include="Utils\BaseUtil.cs" />
     <Compile Include="Modules\Minecraft\ModComp.cs" />
     <Compile Include="Modules\Minecraft\ModDownload.cs" />
     <Compile Include="Utils\BitmapUtils.cs" />
+    <Compile Include="Utils\DebugUtil.cs" />
     <Compile Include="Utils\Enum\MyLoadingState.cs" />
+    <Compile Include="Utils\FeedbackUtil.cs" />
     <Compile Include="Utils\FileUtil.cs" />
     <Compile Include="Utils\Interface\ILoadingTrigger.cs" />
     <Compile Include="Utils\LoaderBase.cs" />
@@ -94,6 +111,11 @@
     <Compile Include="ViewModules\HintModule.cs" />
     <Compile Include="ViewModules\ModMinecraft.cs" />
     <Compile Include="ViewModules\ModSetup.cs" />
+    <Compile Include="ViewModules\MyColor.cs" />
+    <Compile Include="ViewModules\MyRect.cs" />
+    <Compile Include="ViewModules\ViewBase.cs" />
+    <Compile Include="ViewModules\ViewMMyMsgBox.cs" />
+    <Compile Include="ViewModules\ViewMUI.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -109,7 +131,19 @@
     <None Include="resources\Custom.xaml">
       <Generator>MSBuild:Compile</Generator>
     </None>
+    <Page Include="MyControls\MyButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MyControls\MyExtraButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MyControls\MyLoading.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MyControls\MyMsg\MyMsgInput.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -214,7 +248,7 @@
     <Content Include="resources\transformer.jar" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="View\" />
+    <Folder Include="View\PageSetup\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

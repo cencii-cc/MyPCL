@@ -40,18 +40,14 @@ namespace MyPCL.MyControls
             {
                 if (Math.Abs(_Progress - value) < 0.0001) return;
                 _Progress = value;
-
-                var panProgress = GetTemplateChild("PanProgress") as Border;
-                var rectProgress = GetTemplateChild("RectProgress") as RectangleGeometry;
-
                 if (value < 0.0001)
                 {
-                    panProgress.Visibility = Visibility.Collapsed;
+                    PanProgress.Visibility = Visibility.Collapsed;
                 }
                 else
                 {
-                    panProgress.Visibility = Visibility.Visible;
-                    rectProgress.Rect = new Rect(0, 40 * (1 - value), 40, 40 * value);
+                    PanProgress.Visibility = Visibility.Visible;
+                    RectProgress.Rect = new Rect(0, 40 * (1 - value), 40, 40 * value);
                 }
             }
         }
@@ -84,9 +80,8 @@ namespace MyPCL.MyControls
             set
             {
                 _LogoScale = value;
-                var path = GetTemplateChild("Path") as Path;
-                if (path != null)
-                    path.RenderTransform = new ScaleTransform(value, value);
+                if (Path != null)
+                    Path.RenderTransform = new ScaleTransform(value, value);
             }
         }
 

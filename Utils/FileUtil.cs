@@ -12,6 +12,9 @@ using System.Windows.Input;
 using File = System.IO.File;
 using static MyPCL.Modules.ModBase;
 using static MyPCL.Utils.StringUtil;
+using static MyPCL.Utils.LogUtil;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace MyPCL.Utils
 {
@@ -304,6 +307,86 @@ namespace MyPCL.Utils
         public static string GetTempPath(string url)
         {
             return $"{PathTemp}MyImage\\{GetHash(url)}.png";
+        }
+
+
+        /// <summary>
+        /// 打开 explorer。<br/>
+        /// 若不以 \ 结尾，则将视作文件路径，打开并选中此文件。
+        /// </summary>
+        /// <param name="location"></param>
+        public static void OpenExplorer(string location)
+        {
+            try
+            {
+                location = ShortenPath(location.Replace("/", "\\").Trim(' ', '"'));
+                Log("[System] 正在打开资源管理器：" + location);
+                if (location.EndsWith("\\"))
+                {
+                    ShellOnly(location);
+                }
+                else
+                {
+                    ShellOnly("explorer", $"/select,\"{location}\"");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log(ex, "打开资源管理器失败，请尝试关闭安全软件（如 360 安全卫士）", LogLevel.Msgbox);
+            }
+        }
+
+        /// <summary>
+        /// 前台运行文件。
+        /// </summary>
+        /// <param name="fileName">文件名。可以为“notepad”等缩写。</param>
+        /// <param name="arguments">运行参数.</param>
+        public static void ShellOnly(string fileName, string arguments = "")
+        {
+            fileName = ShortenPath(fileName);
+            using (Process program = new Process())
+            {
+                program.StartInfo.Arguments = arguments;
+                program.StartInfo.FileName = fileName;
+                Log("[System] 执行外部命令：" + fileName + " " + arguments);
+                try
+                {
+                    program.Start();
+                }
+                catch (Exception ex)
+                {
+                    // 可以根据需要处理这里的异常，例如记录更详细的错误信息
+                    Log(ex, "执行外部命令失败：" + fileName + " " + arguments, LogLevel.Error);
+                }
+            }
+        }
+
+        // 声明 Windows API 函数 GetShortPathNameA
+        [DllImport("kernel32", CharSet = CharSet.Ansi, SetLastError = true)]
+        static extern int GetShortPathName(string lpszLongPath, StringBuilder lpszShortPath, int cchBuffer);
+
+        /// <summary>
+        /// 若路径长度大于指定值，则将长路径转换为短路径。
+        /// </summary>
+        /// <param name="longPath">长路径字符串</param>
+        /// <param name="shortenThreshold">路径长度阈值，默认值为 247</param>
+        /// <returns>转换后的短路径，如果原路径长度不超过阈值则返回原路径</returns>
+        public static string ShortenPath(string longPath, int shortenThreshold = 247)
+        {
+            if (longPath.Length <= shortenThreshold)
+            {
+                return longPath;
+            }
+
+            StringBuilder shortPath = new StringBuilder(260);
+            int result = GetShortPathName(longPath, shortPath, shortPath.Capacity);
+            if (result > 0)
+            {
+                return shortPath.ToString();
+            }
+
+            // 如果函数调用失败，可以根据需要处理错误，这里简单返回原路径
+            return longPath;
         }
 
         /// <summary>   

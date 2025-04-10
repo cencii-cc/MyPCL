@@ -5,8 +5,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using static MyPCL.Utils.BaseUtil;
+using static MyPCL.Modules.ModBase;
+using static MyPCL.ViewModules.HintModule;
+using static MyPCL.ViewModules.ViewMMyMsgBox;
+using System.Windows;
 
 namespace MyPCL.Utils
 {
@@ -59,6 +65,8 @@ namespace MyPCL.Utils
         /// </summary>
         private static StreamWriter LogWritter;
 
+        private static object LogListLock = new object();
+
         public static void LogStart()
         {
             ThreadUtil.RunInNewThread(() => {
@@ -95,15 +103,208 @@ namespace MyPCL.Utils
         /// <param name="Desc">错误描述。会在处理时在末尾加入冒号。</param>
         /// <param name="Level"></param>
         /// <param name="Title"></param>
-        public static void Log(Exception Ex,string Desc,LogLevel Level = LogLevel.Debug,string Title = "出现错误")
+        public static void Log(string text, LogLevel level = LogLevel.Normal, string title = "出现错误")
         {
-            if (Ex is ThreadInterruptedException)
+            try
             {
-                return;
+                // 输出日志
+                string appendText = $"[{GetTimeNow()}] {text}{Environment.NewLine}";
+                if (ModeDebug)
+                {
+                    lock (LogListLock)
+                    {
+                        LogList.Append(appendText);
+                    }
+                }
+                else
+                {
+                    LogList.Append(appendText);
+                }
+
+#if DEBUG
+                Console.Write(appendText);
+#endif
+
+                if (IsProgramEnded || level == LogLevel.Normal)
+                {
+                    return;
+                }
+
+                // 去除前缀
+                text = Regex.Replace(text, @"\[[^\]]+?\] ", "");
+
+                // 输出提示
+                switch (level)
+                {
+#if DEBUG
+                    case LogLevel.Developer:
+                        Hint($"[开发者模式] {text}", HintType.Info, false);
+                        break;
+                    case LogLevel.Debug:
+                        Hint($"[调试模式] {text}", HintType.Info, false);
+                        break;
+#else
+                case LogLevel.Developer:
+                    break;
+                case LogLevel.Debug:
+                    if (ModeDebug)
+                    {
+                        Hint($"[调试模式] {text}", HintType.Info, false);
+                    }
+                    break;
+#endif
+                    case LogLevel.Hint:
+                        Hint(text, HintType.Critical, false);
+                        break;
+                    case LogLevel.Msgbox:
+                        MyMsgBox(text, title, isWarn:true);
+                        break;
+                    case LogLevel.Feedback:
+                        if (CanFeedback(false))
+                        {
+                            if (MyMsgBox($"{text}{Environment.NewLine}{Environment.NewLine}是否反馈此问题？如果不反馈，这个问题可能永远无法得到解决！", title, "反馈", "取消", true) == 1)
+                            {
+                                Feedback(false, true);
+                            }
+                        }
+                        else
+                        {
+                            MyMsgBox($"{text}{Environment.NewLine}{Environment.NewLine}将 PCL 更新至最新版或许可以解决这个问题……", title, true);
+                        }
+                        break;
+                    case LogLevel.Assert:
+                        long time = GetTimeTick();
+                        if (CanFeedback(false))
+                        {
+                            if (System.Windows.Forms.MessageBox.Show($"{text}{Environment.NewLine}{Environment.NewLine}是否反馈此问题？如果不反馈，这个问题可能永远无法得到解决！", title, System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Critical) == System.Windows.Forms.DialogResult.Yes)
+                            {
+                                Feedback(false, true);
+                            }
+                        }
+                        else
+                        {
+                            System.Windows.Forms.MessageBox.Show($"{text}{Environment.NewLine}{Environment.NewLine}将 PCL 更新至最新版或许可以解决这个问题……", title, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Critical);
+                        }
+                        if (GetTimeTick() - time < 1500)
+                        {
+                            // 弹窗无法保留
+                            Log($"[System] PCL 已崩溃：{Environment.NewLine}{text}");
+                            FormMain.EndProgramForce(ProcessReturnValues.Exception);
+                        }
+                        else
+                        {
+                            FormMain.EndProgramForce(ProcessReturnValues.Fail);
+                        }
+                        break;
+                }
             }
-            // 获取错误信息
-            //string ExFull = $"{Desc}:"
+            catch
+            {
+                // 原代码使用 On Error Resume Next，这里简单忽略异常
+            }
         }
 
+
+        public static void Log(Exception Ex, string Desc, LogLevel Level = LogLevel.Debug, string Title = "出现错误")
+        {
+            try
+            {
+                string ExFull = Desc + "：" + GetExceptionDetail(Ex);
+
+                string AppendText = "[" + GetTimeNow() + "] " + Desc + "：" + GetExceptionDetail(Ex, true) + Environment.NewLine;
+                if (ModeDebug)
+                {
+                    lock (LogListLock)
+                    {
+                        LogList.Append(AppendText);
+                    }
+                }
+                else
+                {
+                    LogList.Append(AppendText);
+                }
+
+#if DEBUG
+                Console.Write(AppendText);
+#endif
+
+                if (IsProgramEnded)
+                {
+                    return;
+                }
+
+                switch (Level)
+                {
+                    case LogLevel.Normal:
+#if DEBUG
+                        break;
+                    case LogLevel.Developer:
+                        string ExLineDeveloper = Desc + "：" + GetExceptionSummary(Ex);
+                        Hint("[开发者模式] " + ExLineDeveloper, HintType.Info, false);
+                        break;
+                    case LogLevel.Debug:
+                        string ExLineDebug = Desc + "：" + GetExceptionSummary(Ex);
+                        Hint("[调试模式] " + ExLineDebug, HintType.Info, false);
+                        break;
+#else
+            case LogLevel.Developer:
+            case LogLevel.Debug:
+                string ExLine = Desc + "：" + GetExceptionSummary(Ex);
+                if (ModeDebug)
+                {
+                    Hint("[调试模式] " + ExLine, HintType.Info, false);
+                }
+                break;
+#endif
+                    case LogLevel.Hint:
+                        string ExLineHint = Desc + "：" + GetExceptionSummary(Ex);
+                        Hint(ExLineHint, HintType.Critical, false);
+                        break;
+                    case LogLevel.Msgbox:
+                        MyMsgBox(ExFull, Title, true);
+                        break;
+                    case LogLevel.Feedback:
+                        if (CanFeedback(false))
+                        {
+                            if (MyMsgBox(ExFull + Environment.NewLine + Environment.NewLine + "是否反馈此问题？如果不反馈，这个问题可能永远无法得到解决！", Title, "反馈", "取消", true) == 1)
+                            {
+                                Feedback(false, true);
+                            }
+                        }
+                        else
+                        {
+                            MyMsgBox(ExFull + Environment.NewLine + Environment.NewLine + "将 PCL 更新至最新版或许可以解决这个问题……", Title, true);
+                        }
+                        break;
+                    case LogLevel.Assert:
+                        long Time = GetTimeTick();
+                        if (CanFeedback(false))
+                        {
+                            if (MessageBox.Show(ExFull + Environment.NewLine + Environment.NewLine + "是否反馈此问题？如果不反馈，这个问题可能永远无法得到解决！", Title, MessageBoxButtons.YesNo, MessageBoxIcon.Critical) == DialogResult.Yes)
+                            {
+                                Feedback(false, true);
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show(ExFull + Environment.NewLine + Environment.NewLine + "将 PCL 更新至最新版或许可以解决这个问题……", Title, MessageBoxButtons.OK, MessageBoxIcon.Critical);
+                        }
+                        if (GetTimeTick() - Time < 1500)
+                        {
+                            Log("[System] PCL 已崩溃：" + Environment.NewLine + ExFull);
+                            FormMain.EndProgramForce(ProcessReturnValues.Exception);
+                        }
+                        else
+                        {
+                            FormMain.EndProgramForce(ProcessReturnValues.Fail);
+                        }
+                        break;
+                }
+            }
+            catch
+            {
+
+            }
+        }
     }
 }
